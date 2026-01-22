@@ -6,12 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
-@RequestMapping ("/api/v1/customers") // http://localhost:8080/api/v1/customers
-// dever criar versionamento de API //v1 é a primeira versão estável da sua API.
-// Versionamento  a forma de identificar a versao da sua API para que ela possa
-// evoluir sem quebrar clientes antigos.
-//“Utilizamos um padrão de URL REST com versionamento (/api/v1) para expor os recursos
-//   da API, garantindo organização e evolução futura
+@RequestMapping ("/api/v1/customers")
 public class CustomerController {
   private final CustomerService customerService;
   public CustomerController(CustomerService   customerService) {
