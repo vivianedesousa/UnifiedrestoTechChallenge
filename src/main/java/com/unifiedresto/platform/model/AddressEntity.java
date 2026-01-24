@@ -28,7 +28,7 @@ public class AddressEntity {
     @Column(name = "postal_code", nullable = false, length = 50)
     private String postalCode;
 
-    // getters e setters padrão (JavaBeans)
+
 
     public Long getId() {
       return id;

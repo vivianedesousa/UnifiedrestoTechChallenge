@@ -5,6 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+// mnada git swagger
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Customers", description = "Endpoints relacionados aos clientes")
 @RestController
 @RequestMapping ("/api/v1/customers")
 public class CustomerController {
@@ -12,21 +17,16 @@ public class CustomerController {
   public CustomerController(CustomerService   customerService) {
       this.customerService = customerService;
   }
-    /* =========================
-       CREATE CUSTOMER
-       POST /customers
-       ========================= */
 
+    @Operation(summary = "Cadastrar cliente")
     @PostMapping
     public ResponseEntity<CustomerResponseDTO> create(
             @RequestBody CustomerRequestDTO dto) {
         CustomerResponseDTO response = customerService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    /* =========================
-       UPDATE (SEM SENHA)
-       PUT /customers/{id}
-       ========================= */
+
+     @Operation(summary = "Atualizar dados do cliente pelo id ")
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponseDTO> update(
             @PathVariable Long id,
@@ -35,28 +35,17 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-    /* =========================
-       LOGIN
-       POST /customers/login // concera rodape
-       ========================= */
+      @Operation(summary = "Login do cliente validando login e senha")
     @PostMapping("/login")
     public ResponseEntity<CustomerResponseDTO> login(
             @RequestBody LoginRequestDTO dto) {
-
         CustomerResponseDTO response =
                 customerService.login(dto.getLogin(), dto.getPassword());
         return ResponseEntity.ok(response);
     }
 
-    /* =========================
-     FIND ALL (DETALHADO)
-     GET /customers
-     ========================= */
 
-    /* =========================
-       SEARCH BY NAME (SIMPLES)
-       GET /customers/search?name=ana
-       ========================= */
+    @Operation(summary = "Buscar clientes por nome")
     @GetMapping("/search")
     public ResponseEntity<List<CustomerResponseDTO>> searchByName(
             @RequestParam String name) { // receber o nome da url
@@ -65,15 +54,14 @@ public class CustomerController {
     }
 
 
+    @Operation(summary = "Listar todos os clientes")
     @GetMapping
     public ResponseEntity<List<CustomerDetailResponseDTO>> findAll() {
         return ResponseEntity.ok(customerService.findAll());
     }
 
-    /* =========================
-       UPDATE PASSWORD
-       PATCH /customers/{id}/password
-       ========================= */
+
+    @Operation(summary = "Alterar senha do cliente pelo id com enpoint separado")
     @PatchMapping("/{id}/password")
     public ResponseEntity<Void> updatePassword(
             @PathVariable Long id,
@@ -83,13 +71,10 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-    /* =========================
-       DELETE
-       DELETE /customers/{id}
-       ========================= */
+
+    @Operation(summary = "Remover cliente pelo id ")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-
         customerService.delete(id);
         return ResponseEntity.noContent().build();
     }

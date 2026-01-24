@@ -1,6 +1,5 @@
 package com.unifiedresto.platform.dto;
 public class AddressResponseDTO {
-    // id nao fica aqui porque ele gerenado automatico
     private String street;
     private String number;
     private String city;

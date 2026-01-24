@@ -1,214 +1,237 @@
-# Projeto: [ Unifiedresto Platform ]
+# Unifiedresto Platform API
 
-Equipe: [ Equipe numero 34 ]
-
----
-
-## 1. Introdução
-
-### Descrição do problema
-
-O projeto [ Unifiedresto Platform  ] consiste no desenvolvimento de um backend para gestão de usuários em um ecossistema de restaurantes. O sistema contempla dois perfis distintos de usuários: clientes e donos de restaurante, garantindo regras específicas de cadastro, autenticação, atualização de dados e segurança.
-
-A aplicação foi construída seguindo boas práticas de arquitetura, padronização de erros e versionamento de API, atendendo integralmente aos requisitos propostos no desafio.
-
-### Objetivo do projeto
-
-Desenvolver um backend robusto utilizando Spring Boot, com persistência em banco de dados relacional, documentação via Swagger/OpenAPI, execução com Docker Compose e testes automatizados.
+API REST para uma plataforma unificada de **clientes e restaurantes**, desenvolvida como parte de um *Tech Challenge*. Esta API permite cadastro, autenticação, consulta, atualização e remoção de clientes e restaurantes.
 
 ---
 
-## 2. Arquitetura do Sistema
+## 📌 Visão Geral
 
-### Descrição da Arquitetura
-
-A aplicação segue o padrão de arquitetura em camadas:
-
-* Controller: Responsável por expor os endpoints REST e receber as requisições HTTP.
-* Service: Contém as regras de negócio e validações da aplicação.
-* Repository: Camada de acesso a dados utilizando Spring Data JPA.
-* Model (Entity): Representa as entidades persistidas no banco de dados.
-* DTO (Data Transfer Object): Responsável por padronizar a entrada e saída de dados da API.
-* *Exception / Handler: Implementa o padrão *ProblemDetail (RFC 7807) para respostas de erro padronizadas.
-
-O sistema utiliza API versionada (/api/v1) e banco de dados relacional (PostgreSQL ou MySQL), executado via Docker Compose.
-
-### Diagrama da Arquitetura (Descrição)
-
-
-Controller -> Service -> Repository -> Database
-|
--> DTO / Validation / Exception Handling
-
+- **Base URL:** `http://localhost:8080/api/v1`
+- **Formato:** JSON
+- **Arquitetura:** REST
+- **Versionamento:** `/v1`
 
 ---
 
-## 3. Modelagem das Entidades
+## 🔐 Autenticação
 
-### Address
+Atualmente, a autenticação é realizada via **login e senha**, retornando (presumidamente) um token ou sessão (não especificado na collection).
 
-* address_id (PK)
-* street
-* number
-* city
-* postal_code
-
-### Customer
-
-* customer_id (PK)
-* name
-* cpf (único)
-* email (único)
-* login (único)
-* password
-* last_update
-* address_id (FK – relacionamento OneToOne)
-
-### Restaurant
-
-* restaurant_id (PK)
-* name
-* cnpj (único)
-* email (único)
-* login (único)
-* password
-* last_update
-* address_id (FK – relacionamento OneToOne)
+> ⚠️ Caso a API utilize JWT ou outro mecanismo, recomenda-se documentar o header `Authorization`.
 
 ---
 
-## 4. Descrição dos Endpoints da API
+## 👤 Customers (Clientes)
 
-### Customers (/api/v1/customers)
+### ➕ Cadastrar cliente
 
-| Endpoint       | Método | Descrição                        |
-| -------------- | ------ | -------------------------------- |
-| /              | POST   | Cadastro de cliente              |
-| /{id}          | PUT    | Atualização de dados (sem senha) |
-| /login         | POST   | Login do cliente                 |
-| /search?name=  | GET    | Busca de clientes por nome       |
-| /              | GET    | Listagem completa de clientes    |
-| /{id}/password | PATCH  | Alteração de senha               |
-| /{id}          | DELETE | Remoção de cliente               |
+**POST** `/customers`
 
-### Restaurants (/api/v1/restaurants)
-
-| Endpoint       | Método | Descrição                        |
-| -------------- | ------ | -------------------------------- |
-| /              | POST   | Cadastro de restaurante          |
-| /{id}          | PUT    | Atualização de dados (sem senha) |
-| /login         | POST   | Login do restaurante             |
-| /search?name=  | GET    | Busca por nome                   |
-| /              | GET    | Listagem completa                |
-| /{id}/password | PATCH  | Alteração de senha               |
-| /{id}          | DELETE | Remoção de restaurante           |
-
----
-
-## 5. Tratamento de Erros (ProblemDetail – RFC 7807)
-
-A aplicação utiliza ProblemDetail para padronizar as respostas de erro.
-
-Exemplo de erro 409 (E-mail duplicado):
-
-json
+```json
 {
-"type": "https://unifiedresto/errors/email-already-exists",
-"title": "Email is already registered",
-"status": 409,
-"detail": "Email already exists",
-"instance": "/api/v1/customers"
+  "name": "Maria",
+  "cpf": "124.478.787-50",
+  "email": "maria@email.com",
+  "login": "marialima",
+  "password": "12345677",
+  "address": {
+    "street": "Av Pauli",
+    "number": "190",
+    "city": "São Paulo",
+    "postalCode": "01390-100"
+  }
 }
-
-
-Erros tratados:
-
-* 400 – Dados inválidos
-* 401 – Login ou senha inválidos
-* 404 – Recurso não encontrado
-* 409 – Conflitos (email, login, CPF ou CNPJ duplicados)
+```
 
 ---
 
-## 6. Documentação Swagger
+### 🔑 Login do cliente
 
-A API está documentada utilizando Swagger/OpenAPI, permitindo:
+**POST** `/customers/login`
 
-* Visualização de todos os endpoints
-* Testes diretos pela interface
-* Exemplos de requisição e resposta
-
-A documentação pode ser acessada após a execução da aplicação em:
-
-
-http://localhost:8080/swagger-ui.html
-
+```json
+{
+  "email": "maria@email.com",
+  "login": "marialima",
+  "password": "12345677"
+}
+```
 
 ---
 
-## 7. Collections para Testes (Postman)
+### 📄 Listar todos os clientes
 
-A collection do Postman contempla os principais cenários:
+**GET** `/customers`
 
-* Cadastro válido
-* Cadastro inválido (email, login, CPF/CNPJ duplicados)
-* Login válido e inválido
-* Atualização de dados
-* Troca de senha (endpoint exclusivo)
-* Busca por nome
-
-A collection está disponível no repositório do projeto em formato JSON.
+Retorna a lista completa de clientes cadastrados.
 
 ---
 
-## 8. Banco de Dados
+### 🔍 Buscar clientes por nome
 
-Banco relacional utilizando PostgreSQL ou MySQL.
+**GET** `/customers/search?name=Maria`
 
-Tabelas principais:
-
-* address
-* customer
-* restaurant
-
-Relacionamentos:
-
-* Customer → Address (OneToOne)
-* Restaurant → Address (OneToOne)
+Parâmetros de query:
+- `name` (string): Nome ou parte do nome do cliente
 
 ---
 
-## 9. Execução com Docker Compose
+### ✏️ Atualizar cliente pelo ID
 
-### Passo a passo
+**PUT** `/customers/{id}`
 
-
-1. Subir os containers:
-
-
-docker-compose up -d
-
-
-3. Acessar a aplicação:
-
-
-http://localhost:8080
-
-
-O docker-compose.yml orquestra a aplicação Spring Boot e o banco de dados, incluindo variáveis de ambiente para conexão.
+```json
+{
+  "name": "Rafaela Atualizada",
+  "email": "rafaela@email.com",
+  "login": "raquel"
+}
+```
 
 ---
 
-## 10. Qualidade do Código
+### 🔒 Alterar senha do cliente
 
-* Uso de boas práticas do Spring Boot
-* Separação clara de responsabilidades
-* Aplicação dos princípios SOLID
-* Código organizado e testável
-* Testes unitários com JUnit e Mockito
+**PATCH** `/customers/{id}/password`
+
+```json
+{
+  "currentPassword": "password4578",
+  "password": "novaSenha1237777777"
+}
+```
 
 ---
 
-## 12. Considerações Finais
+### 🗑️ Remover cliente pelo ID
 
-O projeto atende a todos os requisitos propostos, apresentando uma arquitetura sólida, código limpo, documentação completa e tratamento de erros padronizado, estando apto para avaliação acadêmica e futura evolução.
+**DELETE** `/customers/{id}`
+
+Remove permanentemente o cliente.
+
+---
+
+## 🍽️ Restaurants (Restaurantes)
+
+### ➕ Cadastrar restaurante
+
+**POST** `/restaurants`
+
+```json
+{
+  "name": "Vivian Taste Restaurant",
+  "cnpj": "12.349.678/0001-78",
+  "email": "vivia@hometasterestaurant.com",
+  "login": "vivnerestaurant",
+  "password": "viviane@@9",
+  "address": {
+    "street": "Av Flores",
+    "number": "1056",
+    "city": "Vitória - ES",
+    "postalCode": "01367-190"
+  }
+}
+```
+
+---
+
+### 🔑 Login do restaurante
+
+**POST** `/restaurants/login`
+
+```json
+{
+  "login": "hometasterestaurant",
+  "password": "ana35678"
+}
+```
+
+---
+
+### 📄 Listar todos os restaurantes
+
+**GET** `/restaurants`
+
+Retorna todos os restaurantes cadastrados.
+
+---
+
+### 🔍 Buscar restaurante por nome
+
+**GET** `/restaurants/search?name=Golden`
+
+Parâmetros de query:
+- `name` (string): Nome ou parte do nome do restaurante
+
+---
+
+### ✏️ Atualizar restaurante pelo ID
+
+**PUT** `/restaurants/{id}`
+
+```json
+{
+  "name": "Golden Fork Bistro Atualizado",
+  "email": "cont@goldenforkbistro.com",
+  "login": "goldenfork",
+  "address": {
+    "street": "Rua Nova",
+    "number": "200",
+    "city": "São Paulo",
+    "postalCode": "01000-000"
+  }
+}
+```
+
+---
+
+### 🔒 Alterar senha do restaurante
+
+**PATCH** `/restaurants/{id}/password`
+
+```json
+{
+  "currentPassword": "123456",
+  "password": "SenhaNova@2029"
+}
+```
+
+---
+
+## 🧪 Testes
+
+Esta API possui uma **Postman Collection** para testes manuais:
+- Collection: `UnifiedrestoPlatformTechChallenge.postman_collection.json`
+
+---
+
+## 🚀 Executando o projeto
+
+```bash
+# exemplo genérico
+mvn spring-boot:run
+```
+
+API disponível em:
+```
+http://localhost:8080/api/v1
+```
+
+---
+
+## 📎 Observações Técnicas
+
+- Endpoints seguem padrão REST
+- Versionamento por URL
+- Estrutura pronta para integração com API Gateway
+- Ideal para uso em ambientes Docker/Kubernetes
+
+---
+
+## ✍️ Autor Viviane de Sousa Lima
+
+Projeto desenvolvido para fins de estudo e avaliação técnica.
+
+---
+
+Se desejar, este README pode ser facilmente convertido para **Swagger / OpenAPI**, ou

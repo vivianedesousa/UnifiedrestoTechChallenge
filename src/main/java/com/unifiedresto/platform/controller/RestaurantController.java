@@ -5,36 +5,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+// mnada git swagger
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Restaurants", description = "Endpoints relacionados aos restaurantes")
 @RestController
 @RequestMapping("/api/v1/restaurants")
 public class RestaurantController {
     private final RestaurantService restaurantService;
+
     public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
     }
 
-
-    // pegar todos os resaturante detalhado
-    @GetMapping
-    public ResponseEntity<List<RestaurantDetailResponseDTO>> findAll() {
-        return ResponseEntity.ok(restaurantService.findAll());
-    }
-
-    /* =========================
-       SEARCH BY NAME (SIMPLES)
-       GET /customers/search?name=ana
-       ========================= */
-    @GetMapping("/search")
-    public ResponseEntity<List<RestaurantResponseDTO>> searchByName(
-            @RequestParam String name) { // receber o nome da url
-        return ResponseEntity.ok(restaurantService.searchByName(name));
-    }
-
-    /* =========================
-       CREATE
-       POST /restaurants
-       ========================= */
+    @Operation(summary = "Cadastrar restaurante")
     @PostMapping
     public ResponseEntity<RestaurantResponseDTO> create(
             @RequestBody RestaurantRequestDTO dto) {
@@ -42,43 +26,41 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /* =========================
-       LOGIN /    // fazer login do db
-       POST /restaurants/login
-       “Validação de login obrigatória, por meio de um serviço que
-        verifique se login e senha são válidos”
-       ========================= */
+    @Operation(summary = "Listar todos os restaurantes")
+    @GetMapping
+    // pegar todos os resaturante detalhado
+    public ResponseEntity<List<RestaurantDetailResponseDTO>> findAll() {
+        return ResponseEntity.ok(restaurantService.findAll());
+    }
+
+    @Operation(summary = "Buscar restaurantes por nome")
+    @GetMapping("/search")
+    public ResponseEntity<List<RestaurantResponseDTO>> searchByName(
+            @RequestParam String name) { // receber o nome da url
+        return ResponseEntity.ok(restaurantService.searchByName(name));
+    }
+
+    @Operation(summary = "Login do restaurante validando login e senha")
     @PostMapping("/login")
     public ResponseEntity<RestaurantResponseDTO> login(
-       @RequestBody LoginRequestDTO dto) {
+            @RequestBody LoginRequestDTO dto) {
         RestaurantResponseDTO response =
-         restaurantService.login(dto.getLogin(), dto.getPassword());
+                restaurantService.login(dto.getLogin(), dto.getPassword());
         return ResponseEntity.ok(response);
     }
 
-
-
-    /* =========================
-       UPDATE PASSWORD
-       PATCH /restaurants/{id}/password
-       Troca de senha do usuário em endpoint separado” dentro DB
-       ========================= */
+    @Operation(summary = "Alterar senha do restaurante pelo id no enpoint separado")
     @PatchMapping("/{id}/password")
-    public ResponseEntity<Void> updatePassword(
-            @PathVariable Long id,
-            @RequestBody PasswordRequestDTO dto) {
+
+   public ResponseEntity<Void> updatePassword(
+           @PathVariable Long id,
+           @RequestBody PasswordRequestDTO dto) {
         restaurantService.updatePassword(id, dto);
-        return ResponseEntity.noContent().build();
-    }
-    /* =========================
-       UPDATE (SEM SENHA)
-       PUT /restaurants/{id}
-       //Optional<RestaurantEntity> findById(Long id);
-       “Atualização das demais informações do usuário
-       // //PUT/restaurants/{id}  Atualizacao do usuario sem (SENHA)
-       em endpoint distinto do endpoint de senha”
-       ========================= */
-    @PutMapping("/{id}") // ate  aqui
+       return ResponseEntity.noContent().build();
+  }
+
+  @Operation(summary = "Atualizar dados do restaurante pelo id")
+  @PutMapping("/{id}") // ate  aqui
     public ResponseEntity<RestaurantResponseDTO> update(
             @PathVariable Long id,
             @RequestBody RestaurantRequestDTO dto) {
@@ -86,14 +68,12 @@ public class RestaurantController {
         return ResponseEntity.ok(response);
     }
 
-    /* =========================
-       DELETE
-       DELETE /restaurants/{id}
-       ========================= */
+    @Operation(summary = "Remover restaurante pelo id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         restaurantService.delete(id);
         return ResponseEntity.noContent().build();
+
     }
 }
 

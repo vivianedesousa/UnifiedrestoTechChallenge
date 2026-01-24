@@ -14,32 +14,27 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CustomerServiceImpl implements CustomerService{
-  public  final CustomerRepository customerRepository;
-  public  final AddressRepository addressRepository;
-  public CustomerServiceImpl(CustomerRepository customerRepository, AddressRepository addressRepository) {
-    this.customerRepository = customerRepository;
-    this.addressRepository = addressRepository;
-  }
-    /* =========================
-        CREATE CLEINTE
-     ========================= */
+public class CustomerServiceImpl implements CustomerService {
+    public final CustomerRepository customerRepository;
+    public final AddressRepository addressRepository;
+
+    public CustomerServiceImpl(CustomerRepository customerRepository, AddressRepository addressRepository) {
+        this.customerRepository = customerRepository;
+        this.addressRepository = addressRepository;
+    }
+
     @Override
     @Transactional // @Transactional faz commit NO DB
     public CustomerResponseDTO create(CustomerRequestDTO dto) {
-
         if (customerRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException(); // lancando um aexercao
         }
-
         if (customerRepository.existsByLogin(dto.getLogin())) {
             throw new LoginAlreadyExistsException();
         }
-
         if (customerRepository.existsByCpf(dto.getCpf())) {
             throw new CpfAlreadyExistsException();
         }
-
         AddressEntity address = new AddressEntity();
         address.setStreet(dto.getAddress().getStreet());
         address.setNumber(dto.getAddress().getNumber());
@@ -57,34 +52,53 @@ public class CustomerServiceImpl implements CustomerService{
 
         CustomerEntity saved = customerRepository.save(customer);
         return toResponse(saved);
-  }
+    }
 
+ /// manda para git mudanca
+    // usa este texto feat: ajustes na atualização de clientes e restaurantes com validações
     @Override
     @Transactional
-     //Atualizacao do usuariof sem (SENHA) um cleinte normal // UPDATE (404)
     public CustomerResponseDTO update(Long id, CustomerRequestDTO dto) {
         Optional<CustomerEntity> optionalCustomer =
                 customerRepository.findById(id);
 
-        if (optionalCustomer.isEmpty()){
-            throw new ResourceNotFoundException("customer not found");
+        if (optionalCustomer.isEmpty()) {
+            throw new ResourceNotFoundException("Customer not found");
         }
 
         CustomerEntity customer = optionalCustomer.get();
+
+        // valida email único
+        if (customerRepository.existsByEmail(dto.getEmail())
+                && !customer.getEmail().equals(dto.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        // valida login único
+        if (customerRepository.existsByLogin(dto.getLogin())
+                && !customer.getLogin().equals(dto.getLogin())) {
+            throw new LoginAlreadyExistsException();
+        }
+
+        // atualiza dados básicos
         customer.setEmail(dto.getEmail());
         customer.setLogin(dto.getLogin());
 
         // atualiza endereço
-        AddressEntity address = customer.getAddress();
-        address.setStreet(dto.getAddress().getStreet());
-        address.setNumber(dto.getAddress().getNumber());
-        address.setCity(dto.getAddress().getCity());
-        address.setPostalCode(dto.getAddress().getPostalCode());
-        // atualizando os dados
+        if (customer.getAddress() != null && dto.getAddress() != null) {
+            AddressEntity address = customer.getAddress();
+            address.setStreet(dto.getAddress().getStreet());
+            address.setNumber(dto.getAddress().getNumber());
+            address.setCity(dto.getAddress().getCity());
+            address.setPostalCode(dto.getAddress().getPostalCode());
+        }
+
         customer.setLastUpdate(LocalDateTime.now());
+
         return toResponse(customerRepository.save(customer));
     }
-   ///  LOGIN validar login+ senha dentro banco de dados LOGIN (401)
+
+
     @Override
     @Transactional
     public CustomerResponseDTO login(String login, String password) {
@@ -100,41 +114,31 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     @Transactional
-    /* =========================
-       SEARCH BY NAME
-       ========================= */
     public List<CustomerResponseDTO> searchByName(String name) {
         List<CustomerEntity> customers =
                 customerRepository.findByNameContainingIgnoreCase(name);
-
         List<CustomerResponseDTO> responseList = new ArrayList<>();
-
         for (CustomerEntity customer : customers) {
             responseList.add(toResponse(customer));
         }
-
         return responseList;
     }
 
-    /* =========================
-      FIND ALL revisar//@Transactional(readOnly = true)
-      ========================= */
     @Override
     @Transactional
     public List<CustomerDetailResponseDTO> findAll() {
-            // 1. Busca todos os clientes no banco
+            //  Busca todos os clientes no banco
             List<CustomerEntity> customers = customerRepository.findAll();
-            // 2. Cria a lista de resposta
+            // Cria a lista de resposta
             List<CustomerDetailResponseDTO> responseList = new ArrayList<>();
-            // 3. Converte Entity -> DetailResponseDTO
+            //  Converte Entity -> DetailResponseDTO
             for (CustomerEntity customer : customers) {
                 responseList.add(toDetailResponse(customer));
             }
-            // 4. Retorna a lista detalhada
+            // Retorna a lista detalhada
             return responseList;
     }
-
-  // atualizar a senha somente no enpoint separado UPDATE PASSWORD (404)
+          //feita atualizcao que esta faltando  usa metodo save para persit no db
     @Override
     public void updatePassword(Long id, PasswordRequestDTO dto) {
         Optional<CustomerEntity> optional = customerRepository.findById(id);
@@ -146,11 +150,12 @@ public class CustomerServiceImpl implements CustomerService{
         if (!customer.getPassword().equals(dto.getCurrentPassword())) {
             throw new InvalidPasswordException();
         }
-        // troca
+        // troca de senha
         customer.setPassword(dto.getPassword());
         customer.setLastUpdate(LocalDateTime.now());
+        customerRepository.save(customer);
     }
-   // DELETE (404)
+
     @Override
     @Transactional
     public void delete(long id) {
@@ -161,13 +166,14 @@ public class CustomerServiceImpl implements CustomerService{
         }
     }
 
-    // ENTITY -> DTO //
+     // ENTITY -> DTO
     private CustomerResponseDTO toResponse(CustomerEntity customer) {
         CustomerResponseDTO dto = new CustomerResponseDTO();
         dto.setId(customer.getId());
         dto.setName(customer.getName());
         dto.setEmail(customer.getEmail());
         dto.setLogin(customer.getLogin());
+        dto.setLastUpdate(customer.getLastUpdate()); // feito mudancao nao retorno
         return dto;
     }
 
@@ -179,6 +185,7 @@ public class CustomerServiceImpl implements CustomerService{
         dto.setEmail(customer.getEmail());
         dto.setLogin(customer.getLogin());
         dto.setLastUpdate(customer.getLastUpdate());
+
          // se existe risco de cliente sem endereco
          if(customer.getAddress()!= null) {
              AddressResponseDTO addressDTO = new AddressResponseDTO();
@@ -189,7 +196,7 @@ public class CustomerServiceImpl implements CustomerService{
              dto.setAddress(addressDTO);
          }
         return dto;
-    }
+  }
 }
 
 

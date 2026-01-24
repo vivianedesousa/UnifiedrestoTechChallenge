@@ -1,10 +1,12 @@
 package com.unifiedresto.platform.dto;
+import java.time.LocalDateTime;
 // retorna dados ao cleinte
 public class RestaurantResponseDTO {
     private Long id;
     private String name;
     private String email;
     private String login;
+    private LocalDateTime lastUpdate; //// no isso foi muda no mada para github
 
     public Long getId() {
         return id;
@@ -37,5 +39,13 @@ public class RestaurantResponseDTO {
     public void setLogin(String login) {
         this.login = login;
     }
+    public LocalDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(LocalDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
 
 }

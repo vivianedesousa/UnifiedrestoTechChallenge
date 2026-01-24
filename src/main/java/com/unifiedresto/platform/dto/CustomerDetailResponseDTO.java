@@ -9,6 +9,7 @@ public class CustomerDetailResponseDTO {
     private String login;
     private LocalDateTime lastUpdate;
     private AddressResponseDTO address;
+
     public Long getId() {
         return id;
     }
@@ -56,7 +57,6 @@ public class CustomerDetailResponseDTO {
     public void setAddress(AddressResponseDTO address) {
         this.address = address;
     }
-
 
     public LocalDateTime getLastUpdate() {
         return lastUpdate;

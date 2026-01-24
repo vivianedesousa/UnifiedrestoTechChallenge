@@ -96,6 +96,7 @@ public class GlobalExceptionHandler {
         return errorResponse ;
     }
 
+
     @ExceptionHandler(InvalidPasswordException.class)
     public ProblemDetail handleInvalidPassword(
             InvalidPasswordException ex,
@@ -108,7 +109,6 @@ public class GlobalExceptionHandler {
         errorResponse.setInstance(URI.create(httpRequest.getRequestURI()));
         return errorResponse;
     }
-
 
     // ===============================
     // 404 - RECURSO NÃO ENCONTRADO
@@ -127,13 +127,3 @@ public class GlobalExceptionHandler {
     }
 }
 
-
-//    //metodo pegar a exercao geral
-//   public ResponseEntity<ProblemDetail> handlerRuntime(
-//    RuntimeException exception, HttpServletRequest request) {
-//      ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-//      problem.setTitle("Erro validation");
-//      problem.setDetail(exception.getMessage());
-//      problem.setType(URI.create("https://api.unifiedresto.com/errors/validation"));
-//      problem.setInstance(URI.create(request.getRequestURI()));
-//      return ResponseEntity.badRequest().body(problem);

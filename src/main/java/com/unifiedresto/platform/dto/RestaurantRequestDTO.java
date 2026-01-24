@@ -1,8 +1,5 @@
 package com.unifiedresto.platform.dto;
- //RequestDTO tem a finalidade receber dados
- //Entity mapeia o banco.
- //Service liga as tabelas.
-//Criar / atualizar restaurante
+
 public class RestaurantRequestDTO {
   //   private Integer orderNumber;
      private String name;
@@ -11,12 +8,7 @@ public class RestaurantRequestDTO {
      private String login;
      private String password;
      private AddressRequestDTO address;// Objeto
-     //Qual a importancia de ter GETTERS AND SETTERS AQUI ??
-     // porque Spring (jackson)usa eles oara realizar a conversao de JSON Para objeto and OBJETO para json
 
-   //  public Integer getOrderNumber() {
-    //     return orderNumber;
-   //  }
 
      public String getName() {
          return name;

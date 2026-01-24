@@ -1,0 +1,25 @@
+
+spring:
+ application:
+   name: unifiedresto-platform
+
+ datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/unifiedresto_db}
+    username: ${SPRING_DATASOURCE_USERNAME:unifiedresto_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:adm12345}
+    driver-class-name: org.postgresql.Driver
+    jpa:
+    hibernate:
+    ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+       format_sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jackson:
+   time-zone: America/Sao_Paulo
+
+server:
+  port: 8080
+

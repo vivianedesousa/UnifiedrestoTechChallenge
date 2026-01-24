@@ -1,42 +1,41 @@
 package com.unifiedresto.platform.dto;
 
 public class AddressRequestDTO {
-         // id nao fica aqui porque ele gerenado automatico
-        private String street;
-        private String number;
-        private String city;
-        private String postalCode;
+    private String street;
+    private String number;
+    private String city;
+    private String postalCode;
 
-        public String getStreet() {
-          return street;
-        }
+    public String getStreet() {
+        return street;
+    }
 
-        public void setStreet(String street) {
-          this.street = street;
-        }
+    public void setStreet(String street) {
+        this.street = street;
+    }
 
-        public String getNumber() {
-          return number;
-        }
+    public String getNumber() {
+        return number;
+    }
 
-        public void setNumber(String number) {
-          this.number = number;
-        }
+    public void setNumber(String number) {
+        this.number = number;
+    }
 
-        public String getCity() {
-          return city;
-        }
+    public String getCity() {
+        return city;
+    }
 
-        public void setCity(String city) {
-          this.city = city;
-        }
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-        public String getPostalCode() {
-          return postalCode;
-        }
+    public String getPostalCode() {
+        return postalCode;
+    }
 
-        public void setPostalCode(String postalCode) {
-          this.postalCode = postalCode;
-      }
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
 }
 
